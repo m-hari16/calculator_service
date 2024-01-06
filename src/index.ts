@@ -19,6 +19,7 @@ app.get('/', (res: Response) => {
 })
 
 /** Register app routes here */
+app.use('/api', baseRoutes)
 
 
 /** Not found routes handler */
