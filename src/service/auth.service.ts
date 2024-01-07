@@ -64,9 +64,7 @@ class authService {
       throw new Error("Unauthenticated")
     }
 
-    const logUserLogout: logAccessWithUserData = await this.accessLogRepo.saveTimestampLogout(decode.accessLogId)
-
-    //TODO: push data to admin dashboard through bullmq
+    await this.accessLogRepo.saveTimestampLogout(decode.accessLogId)
 
     return true
   }

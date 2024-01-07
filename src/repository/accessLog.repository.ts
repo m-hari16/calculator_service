@@ -1,4 +1,4 @@
-import { logAccessWithUserData } from "@/dto/userDTO";
+import { logAccessWithUserData, timeUserAccess } from "@/dto/userDTO";
 import { PrismaClient } from "@prisma/client";
 
 class accessLogRepository {
@@ -52,6 +52,20 @@ class accessLogRepository {
     }
 
     return result
+  }
+
+  async getReportUserAccess(): Promise<{loginAt: Date, logoutAt: Date | null}[]> {
+    const log = await this.prisma.accessLog.findMany({
+      where: {
+        logoutAt: {not: null},
+      },
+      select: {
+        loginAt: true,
+        logoutAt: true
+      }
+    });
+
+    return log
   }
 
 }

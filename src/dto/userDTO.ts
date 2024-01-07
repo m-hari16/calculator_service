@@ -42,3 +42,8 @@ export type logAccessWithUserData = {
   loginAt: Date
   logoutAt: Date | undefined
 }
+
+export type timeUserAccess = {
+  date: Date
+  accessTotalInMinute: number
+}
