@@ -1,12 +1,24 @@
-import { loginDTO, registerDTO, userDTO, userWithAccessTokenDTO, userWithEncryptedPasswordDTO } from "../dto/userDTO";
+import accessLogRepository from "../repository/accessLog.repository";
+import { 
+  logAccessWithUserData, 
+  loginDTO, 
+  payloadAccessTokenRequest, 
+  registerDTO, 
+  userDTO, 
+  userWithAccessTokenDTO, 
+  userWithEncryptedPasswordDTO 
+} from "../dto/userDTO";
 import userRepository from "../repository/user.repository";
 import userPasswordEncrypt from "../utils/bcrypt";
+import * as jwt from "jsonwebtoken"
 
 class authService {
   private userRepo: userRepository
+  private accessLogRepo: accessLogRepository
 
   constructor() { 
     this.userRepo = new userRepository()
+    this.accessLogRepo = new accessLogRepository()
   }
 
   async register(userData: registerDTO): Promise<userDTO> {
@@ -32,7 +44,31 @@ class authService {
       throw new Error("Unauthenticated")
     }
 
-    return userPasswordEncrypt.generateToken(user)   
+    const logUserLogin: logAccessWithUserData = await this.accessLogRepo.saveTimestampLogin(user.id)
+
+    const payloadToken: payloadAccessTokenRequest = {
+      userId: user.id,
+      name: user.name,
+      accessLogId: logUserLogin.id
+    }
+
+    return userPasswordEncrypt.generateToken(payloadToken)   
+  }
+
+  async logout(token: string): Promise<boolean> {
+    const jwtSecret: string | any = process.env.JWT_SECRET
+
+    const decode: payloadAccessTokenRequest | null = jwt.verify(token, jwtSecret) as {userId: string, name: string, accessLogId: string} | null
+
+    if (!decode) {
+      throw new Error("Unauthenticated")
+    }
+
+    const logUserLogout: logAccessWithUserData = await this.accessLogRepo.saveTimestampLogout(decode.accessLogId)
+
+    //TODO: push data to admin dashboard through bullmq
+
+    return true
   }
   
 }

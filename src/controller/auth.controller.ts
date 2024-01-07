@@ -22,6 +22,15 @@ class authController {
 
     return res.status(200).json(dataLogin)
   }
+
+  async logout(req: Request, res: Response): Promise<Response<{success: boolean}>> {
+    const token: string = req.body.token
+    const userLogout: boolean = await this.authSvc.logout(token)
+
+    return res.status(200).json({
+      success: userLogout
+    })
+  }
 }
 
 export default authController

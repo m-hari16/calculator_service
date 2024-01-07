@@ -28,3 +28,17 @@ export type userWithAccessTokenDTO = {
   expiredAt: string
   refreshToken: string
 }
+
+export type payloadAccessTokenRequest = {
+  userId: string
+  name: string
+  accessLogId: string
+}
+
+export type logAccessWithUserData = {
+  id: string
+  userId: string
+  name: string
+  loginAt: Date
+  logoutAt: Date | undefined
+}

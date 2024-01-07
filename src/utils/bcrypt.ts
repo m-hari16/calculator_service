@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv'
 import * as bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { userWithAccessTokenDTO, userWithEncryptedPasswordDTO } from '../dto/userDTO'
+import { payloadAccessTokenRequest, userWithAccessTokenDTO } from '../dto/userDTO'
 
 dotenv.config()
 
@@ -16,12 +16,9 @@ export default class userPasswordEncrypt {
     return bcrypt.compareSync(passwordInput, hashedPassword)
   }
 
-  static generateToken(userData: userWithEncryptedPasswordDTO): userWithAccessTokenDTO {
+  static generateToken(userData: payloadAccessTokenRequest): userWithAccessTokenDTO {
     const accessToken = jwt.sign(
-      {
-        id: userData.id,
-        name: userData.name,
-      },
+      userData,
       jwtSecret,
       {
         expiresIn: '24h'
