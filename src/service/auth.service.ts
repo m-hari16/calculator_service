@@ -11,6 +11,7 @@ import {
 import userRepository from "../repository/user.repository";
 import userPasswordEncrypt from "../utils/bcrypt";
 import * as jwt from "jsonwebtoken"
+import unauthenticated from "../exception/unauthenticated";
 
 class authService {
   private userRepo: userRepository
@@ -41,7 +42,7 @@ class authService {
     const isMatch: boolean = userPasswordEncrypt.comparePassword(user.password, credential.password)
 
     if(!isMatch) {
-      throw new Error("Unauthenticated")
+      throw new unauthenticated()
     }
 
     const logUserLogin: logAccessWithUserData = await this.accessLogRepo.saveTimestampLogin(user.id)
@@ -61,7 +62,7 @@ class authService {
     const decode: payloadAccessTokenRequest | null = jwt.verify(token, jwtSecret) as {userId: string, name: string, accessLogId: string} | null
 
     if (!decode) {
-      throw new Error("Unauthenticated")
+      throw new unauthenticated()
     }
 
     await this.accessLogRepo.saveTimestampLogout(decode.accessLogId)

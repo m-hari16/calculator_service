@@ -3,6 +3,7 @@ import * as dotenv from "dotenv"
 import cors from 'cors'
 import { Request, Response } from 'express'
 import baseRoutes from './routes'
+import errorHandlerMiddleware from './middleware/errorHandler'
 
 
 dotenv.config()
@@ -30,6 +31,8 @@ app.use((req: Request, res: Response) => {
     message: 'Not found'
   })
 })
+
+app.use(errorHandlerMiddleware)
 
 app.listen(port, () => {
   console.log(`Application on port ${port}`)
